@@ -4,7 +4,7 @@ resource "aws_lambda_function" "getAll" {
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.api-object.key
 
-  runtime = "nodejs12.x"
+  runtime = "nodejs18.x"
   handler = "handler.getAll"
   timeout = 10
 
