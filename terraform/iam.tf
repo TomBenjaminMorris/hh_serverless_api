@@ -54,13 +54,13 @@ resource "aws_iam_role_policy_attachment" "lambda_to_ses_attachment" {
 
 data "aws_iam_policy_document" "lambda_to_ses_policy_document" {
   statement {
-    effect = "Allow"
+    effect    = "Allow"
     resources = ["*"]
-    actions = ["ses:SendEmail","ses:SendRawEmail"]
+    actions   = ["ses:SendEmail", "ses:SendRawEmail"]
   }
 }
 
 resource "aws_iam_policy" "lambda_to_ses_policy" {
-  name        = "lambda_to_ses_policy"
-  policy      = data.aws_iam_policy_document.lambda_to_ses_policy_document.json
+  name   = "lambda_to_ses_policy"
+  policy = data.aws_iam_policy_document.lambda_to_ses_policy_document.json
 }

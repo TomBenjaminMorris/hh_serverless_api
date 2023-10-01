@@ -3,7 +3,7 @@ resource "aws_apigatewayv2_api" "lambda" {
   protocol_type = "HTTP"
   cors_configuration {
     allow_origins = ["*"]
-    allow_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST" ,"PUT"]
+    allow_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     allow_headers = ["Content-Type"]
   }
 }
@@ -30,6 +30,11 @@ resource "aws_apigatewayv2_stage" "lambda" {
       integrationErrorMessage = "$context.integrationErrorMessage"
       }
     )
+  }
+
+  default_route_settings {
+    throttling_burst_limit = 100
+    throttling_rate_limit  = 100
   }
 }
 
