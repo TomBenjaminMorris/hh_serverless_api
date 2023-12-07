@@ -1,0 +1,29 @@
+name: Tfsec Checks on Terraform Code
+
+on:
+# Only trigger, when the build workflow succeeded
+#  workflow_run:
+#    workflows: ["Tflint Checks on Terraform Code"]
+#    types:
+#      - completed
+  pull_request:
+    branches:
+      - master
+    paths:
+      - terraform/**
+      
+permissions: read-all
+
+jobs:
+  tfsec-checks:
+      runs-on: ubuntu-latest
+      steps:
+    
+# Checkout Repository
+      - name : Check out Git Repository
+        uses: actions/checkout@v2
+      
+# Tfsec - Security scanner for your Terraform code
+      - name: Run Tfsec
+        uses: aquasecurity/tfsec-action@v1.0.0
+

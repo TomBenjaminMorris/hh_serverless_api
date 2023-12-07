@@ -6,11 +6,6 @@ on:
       - master
     paths:
       - terraform/**
-  push:
-    branches:
-      - master
-    paths:
-      - terraform/**
 
 permissions: read-all
 
