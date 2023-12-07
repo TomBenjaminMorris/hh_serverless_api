@@ -1,6 +1,11 @@
 name: Tflint Checks on Terraform Code
     
 on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - terraform/**
   push:
     branches:
       - master
