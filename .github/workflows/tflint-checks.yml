@@ -41,3 +41,9 @@ jobs:
 # Run tflint command in each directory recursively # use --force if you want to continue with workflow although errors are there
     - name: Run TFLint
       run: tflint -f compact --recursive 
+
+    - uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform fmt
+      run: terraform fmt -check
+      continue-on-error: true
