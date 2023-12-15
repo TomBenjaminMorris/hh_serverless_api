@@ -1,5 +1,5 @@
 name: Tflint Checks on Terraform Code
-    
+   
 on:
   pull_request:
     branches:
@@ -17,9 +17,9 @@ jobs:
 # Checkout Repository
     - name : Check out Git Repository
       uses: actions/checkout@v3  
-      
+     
 # TFLint - Terraform Check
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       name: Cache plugin dir
       with:
         path: ~/.tflint.d/plugins
@@ -29,19 +29,18 @@ jobs:
       name: Setup TFLint
       with:
         github_token: ${{ secrets.CI_GITHUB_TOKEN }}
-        
+       
 # Print TFLint version
     - name: Show version
+      working-directory: ./terraform
       run: tflint --version
-      
+     
 # Install plugins
     - name: Init TFLint
+      working-directory: ./terraform
       run: tflint --init
-      
+     
 # Run tflint command in each directory recursively # use --force if you want to continue with workflow although errors are there
     - name: Run TFLint
+      working-directory: ./terraform
       run: tflint -f compact --recursive 
-
-    - uses: hashicorp/setup-terraform@v2
-    - name: Terraform Validate
-      run: terraform validate

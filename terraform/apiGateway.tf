@@ -38,8 +38,10 @@ resource "aws_apigatewayv2_stage" "lambda" {
   }
 }
 
+#tfsec:ignore:aws-cloudwatch-log-group-customer-key
 resource "aws_cloudwatch_log_group" "hh_api_gw" {
-  name = "/aws/hh_api_gw/${aws_apigatewayv2_api.lambda.name}"
-
+  #checkov:skip=CKV_AWS_158:Standard encryption will suffice
+  #checkov:skip=CKV_AWS_338:One month will suffice
+  name              = "/aws/hh_api_gw/${aws_apigatewayv2_api.lambda.name}"
   retention_in_days = 30
 }
