@@ -55,7 +55,7 @@ resource "aws_iam_role_policy_attachment" "lambda_to_ses_attachment" {
 data "aws_iam_policy_document" "lambda_to_ses_policy_document" {
   statement {
     effect    = "Allow"
-    resources = ["*"]
+    resources = [aws_ses_email_identity.thomasmorris.arn, aws_ses_email_identity.hapihour.arn]
     actions   = ["ses:SendEmail", "ses:SendRawEmail"]
   }
 }
