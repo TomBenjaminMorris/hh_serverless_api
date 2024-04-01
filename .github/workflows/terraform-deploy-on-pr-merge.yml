@@ -1,0 +1,93 @@
+name: "Terraform: Apply on push to master"
+
+# set other jobs with the same 'group' in a queue
+concurrency:
+  group: deploy-test
+  cancel-in-progress: false
+
+on:
+  # run on PR merge, e.g. 'push' changes to the 'master'
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    # only if changes were in the 'terraform' directory
+    paths:
+      - terraform/**
+
+permissions:
+  # create OpenID Connect (OIDC) ID token
+  id-token: write
+  # allow read repository's content by steps
+  contents: read
+
+jobs:
+
+  deploy:
+
+    env:
+        AWS_DEFAULT_REGION: eu-west-2
+    name: "Deploy: Terraform"
+    runs-on: ubuntu-latest
+    # to avoid using GitHub Runners time
+    timeout-minutes: 30
+    defaults:
+      run:
+        # run all steps in the 'terraform' directory
+        working-directory: ./terraform
+
+    steps:
+
+      # get repository's content
+      - name: "Setup: checkout"
+        uses: actions/checkout@v4
+        with:
+            persist-credentials: false
+
+      - name: Reconfigure git to use HTTP authentication
+        run: >
+            git config --global url."https://github.com/".insteadOf
+            ssh://git@github.com/
+
+      # setup 'env.AWS_*' variables to run Terraform
+      - name: "Setup: Configure AWS credentials"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.TF_AWS_ROLE }}
+          role-session-name: github-actions-terraform
+          role-duration-seconds: 900
+          aws-region: ${{env.AWS_DEFAULT_REGION}}
+
+      # use TFLint to check the code
+      - name: "Setup: TFLint"
+        uses: terraform-linters/setup-tflint@v3
+        with:
+          tflint_version: v0.48.0
+          
+      - name: "Test: Terraform lint"
+        run: tflint -f compact
+        shell: bash
+
+      # use official Action
+      - name: "Setup: Terraform"
+        uses: hashicorp/setup-terraform@v3
+
+      # get modules, configure backend
+      - name: "Setup: Terraform Init"
+        id: init
+        run: terraform init -no-color
+
+      # verify whether a configuration is syntactically valid
+      - name: "Test: Terraform Validate"
+        id: validate
+        run: terraform validate -no-color
+
+      # create a Plan to use with the 'apply'
+      - name: "Deploy: Terraform Plan"
+        id: plan
+        run: terraform plan -no-color -out tf.plan
+
+      # deploy changes using Plan's file
+      - name: "Deploy: Terraform Apply"
+        id: apply
+        run: terraform apply -no-color tf.plan
