@@ -1,0 +1,22 @@
+name: "Terraform: Validate and Plan"
+
+concurrency:
+  group: deploy-test
+  cancel-in-progress: false
+
+on:
+  workflow_dispatch:
+      
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+    call-workflow-passing-data:
+      uses: TomBenjaminMorris/github-actions-lib/.github/workflows/terraform-test-on-pr.yml@master
+      with:
+        aws-default-region: eu-west-2
+        tf-aws-role: ${{ vars.TF_AWS_ROLE }}
+        tf-version: "1.0.1"
+      secrets: inherit
